@@ -60,9 +60,10 @@ export default function Home({ dt }: Props) {
     const curfewStart = 20;
     const curfewEnd = 10;
     const localTime = DateTime.local();
+    const weekDay = localTime.weekday
     const age = DateTime.local().year - data.year;
 
-    const isFreeHours = localTime.hour === curfewEnd ? localTime.minute > 0 : localTime.hour > curfewEnd && localTime.hour < curfewStart;
+    const isFreeHours = weekDay < 5 ? true : localTime.hour === curfewEnd ? localTime.minute > 0 : localTime.hour > curfewEnd && localTime.hour < curfewStart;
     const isAgeFreeHours = age < 20 || age >= 65 ? localTime.hour < 13 : isFreeHours;
     const isAllowed = data.isWorking || (isFreeHours && isAgeFreeHours);
 
