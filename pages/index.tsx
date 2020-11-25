@@ -11,7 +11,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
-import { DateTime, Duration, Interval } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { GetStaticProps } from 'next';
 
 type FormData = {
@@ -25,11 +25,13 @@ type Props = {
 
 type Allowance = {
   isAllowed: boolean
+  timeUntilFree?: Duration
+  timeUntilLockdown?: Duration
 }
 
 const useStyles = makeStyles({
   container: {
-    padding: '10px'
+    padding: '10px',
   },
   timer: {
     margin: '5px 0',
@@ -41,6 +43,26 @@ const useStyles = makeStyles({
     fontSize: '48px',
   },
 });
+
+function isInFreeHours(birthYear: number, isWorking: boolean): Allowance {
+  const localTime = DateTime.local();
+  const age = localTime.year - birthYear;
+  const isWeekday = localTime.weekday <= 5;
+  const isAgeExcluded = isWeekday && age >= 20 && age < 65;
+
+  const freeTimeStart = localTime.set({ hour: age < 20 ? 13 : 10 }).startOf('hour');
+  const freeTimeEnd = localTime.set({ hour: age < 20 ? 16 : age >= 65 ? 13 : 20 }).startOf('hour');
+  const timeUntilFree = freeTimeStart.diff(localTime, ['hours', 'minutes', 'seconds']);
+  const timeUntilLockdown = freeTimeEnd.diff(localTime, ['hours', 'minutes', 'seconds']);
+
+  const isFreeHours = isAgeExcluded ? true : localTime >= freeTimeStart && localTime < freeTimeEnd;
+
+  return {
+    isAllowed: isWorking || isFreeHours,
+    timeUntilFree: isAgeExcluded || timeUntilFree.hours <= 0 ? undefined : timeUntilFree,
+    timeUntilLockdown: isAgeExcluded || timeUntilLockdown.hours <= 0 ? undefined : timeUntilLockdown,
+  };
+}
 
 export default function Home({ dt }: Props) {
   const { register, errors, handleSubmit } = useForm<FormData>();
@@ -57,17 +79,7 @@ export default function Home({ dt }: Props) {
   }, []);
 
   const onSubmit = (data: FormData) => {
-    const curfewStart = 20;
-    const curfewEnd = 10;
-    const localTime = DateTime.local();
-    const weekDay = localTime.weekday
-    const age = DateTime.local().year - data.year;
-
-    const isFreeHours = weekDay < 5 ? true : localTime.hour === curfewEnd ? localTime.minute > 0 : localTime.hour > curfewEnd && localTime.hour < curfewStart;
-    const isAgeFreeHours = age < 20 || age >= 65 ? localTime.hour < 13 : isFreeHours;
-    const isAllowed = data.isWorking || (isFreeHours && isAgeFreeHours);
-
-    setAllowance({ isAllowed });
+    setAllowance(isInFreeHours(data.year, data.isWorking));
   };
 
   return (
@@ -96,6 +108,16 @@ export default function Home({ dt }: Props) {
       </form>
       <Typography component="div" className={styles.timer} align="right">Yerel
         saat: {localTime.toLocaleString(DateTime.TIME_24_WITH_SECONDS)}</Typography>
+      {!!allowance && allowance.timeUntilFree && (
+        <Typography component="div" className={styles.timer} align="right">
+          Sokağa çıkmanıza kalan süre: {allowance.timeUntilFree.toFormat('hh:mm')}
+        </Typography>
+      )}
+      {!!allowance && allowance.timeUntilLockdown && (
+        <Typography component="div" className={styles.timer} align="right">
+          Yasağın başlamasına kalan süre: {allowance.timeUntilLockdown.toFormat('hh:mm')}
+        </Typography>
+      )}
       {!!allowance && (
         <Grid container spacing={1} direction="column" alignItems="center">
           <Grid item xs={12}>

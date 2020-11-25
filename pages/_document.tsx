@@ -12,6 +12,17 @@ export default class MyDocument extends Document {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5M41TM6FY" />
+          <script dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-K5M41TM6FY');
+            `,
+          }}>
+          </script>
         </Head>
         <body>
         <Main />
