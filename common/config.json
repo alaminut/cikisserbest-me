@@ -7,10 +7,12 @@
   "ageGroups": [
     {
       "title": "20 yaş altındakiler",
+      "subtitle": "Toplu taşıma araçlarına binişleri kısıtlanmıştır.",
       "age": 19
     },
     {
       "title": "65 yaş ve üzerindekiler",
+      "subtitle": "Toplu taşıma araçlarına binişleri kısıtlanmıştır.",
       "age": 65
     },
     {

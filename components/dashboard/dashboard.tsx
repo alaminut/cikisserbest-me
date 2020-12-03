@@ -13,15 +13,20 @@ const Dashboard = () => {
         {config.ageGroups.map(ages =>
           (<StatusRow key={ages.title}
                       title={ages.title}
-                      status={Lockdown.status(DateTime.local().year - ages.age, false)} />
+                      subtitle={ages.subtitle}
+                      statusChecker={() => Lockdown.status(DateTime.local().year - ages.age, false)} />
           ))
         }
       </List>
       <List dense>
         <ListSubheader>İşletme ve Tedarik Zinciri Durumları</ListSubheader>
-        <StatusRow title='Temel ihtiyaç (bakkal, kasap, market vb...)' status={Lockdown.logistics('basic')} />
-        <StatusRow title='Kafe & lokantalar (sadece sipariş)' status={Lockdown.logistics('basic')} />
-        <StatusRow title='Sinema, tiyatro ve eğlence mekanları' status={Lockdown.logistics('entertainment')} />
+        <StatusRow title='Temel ihtiyaç (bakkal, kasap, market vb...)'
+                   statusChecker={() => Lockdown.logistics('basic')} />
+        <StatusRow title='Kafe & lokantalar (sadece sipariş)'
+                   subtitle="Çalışma saatleri işletmeler bazında farklılık gösterebilir."
+                   statusChecker={() => Lockdown.logistics('basic')} />
+        <StatusRow title='Sinema, tiyatro ve eğlence mekanları'
+                   statusChecker={() => Lockdown.logistics('entertainment')} />
       </List>
     </>
   );
