@@ -11,11 +11,10 @@ const getLockdownStart = (age: number, time = DateTime.local()): DateTime => tim
 
 const getLockdownEnd = (age: number, time = DateTime.local()): DateTime => time.set({ hour: age < 20 ? 13 : age >= 65 ? 10 : 5 }).startOf('hour');
 
-const getLockdownStatus = (age: number, lockdownStart: DateTime, lockdownEnd: DateTime, time = DateTime.local()): LockdownStatus => {
-  const isAgeExcluded = isAgeExcludedFromLockdown(age, time);
-  const lockdown = isAgeExcluded ? false : time >= lockdownStart || time < lockdownEnd;
+const getLockdownStatus = (ageGroupExcluded: boolean, lockdownStart: DateTime, lockdownEnd: DateTime, time = DateTime.local()): LockdownStatus => {
+  const lockdown = ageGroupExcluded ? false : time >= lockdownStart || time < lockdownEnd;
   let duration = undefined;
-  if (!isAgeExcluded) {
+  if (!ageGroupExcluded) {
     if (!lockdown) {
       duration = lockdownStart.diff(time, ['hours', 'minutes']);
     } else {
@@ -35,10 +34,25 @@ const getLockdownStatus = (age: number, lockdownStart: DateTime, lockdownEnd: Da
 
 export const Lockdown = {
   status: (birthYear: number, hasWorkPermit: boolean): Readonly<LockdownStatus> => {
-    const localTime = DateTime.local()
+    const localTime = DateTime.local();
     const age = localTime.year - birthYear;
-    const status = getLockdownStatus(age, getLockdownStart(age, localTime), getLockdownEnd(age, localTime), localTime);
+    const status = getLockdownStatus(isAgeExcludedFromLockdown(age, localTime), getLockdownStart(age, localTime), getLockdownEnd(age, localTime), localTime);
 
     return Object.freeze({ ...status, lockdown: !hasWorkPermit && status.lockdown });
+  },
+  logistics: (type: 'basic' | 'entertainment'): Readonly<LockdownStatus> => {
+    const localTime = DateTime.local();
+    const isWeekend = localTime.weekday > 5;
+    const lockdownStart = localTime.set({ hour: isWeekend ? 17 : 21 }).startOf('hour');
+    const lockdownEnd = localTime.set({ hour: isWeekend ? 10 : 5 }).startOf('hour');
+
+    switch (type) {
+      case 'basic':
+        return getLockdownStatus(false, lockdownStart, lockdownEnd, localTime);
+      case 'entertainment':
+        return {
+          lockdown: true,
+        };
+    }
   },
 };

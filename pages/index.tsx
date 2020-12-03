@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Container } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
+import { Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Lockdown, LockdownStatus } from '../common/lockdown';
-import TimeTicker from '../components/time-ticker/ticker';
-import AgeForm, { AgeFormData } from '../components/age-form/form';
-import StatusDisplay from '../components/status-display/status-display';
+import { Lockdown, LockdownStatus } from '@common/lockdown';
+import AgeForm, { AgeFormData } from '@components/age-form/form';
+import StatusDisplay from '@components/status-display/status-display';
+import Clock from '@components/time-ticker/clock';
+import Dashboard from '@components/dashboard/dashboard';
 
 const useStyles = makeStyles({
   container: {
@@ -25,13 +25,16 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="sm" className={styles.container}>
-      <Typography component="h1" variant="h4" gutterBottom={true}>Şu anda sokağa çıkabilir misin?</Typography>
+    <Container maxWidth='sm' className={styles.container}>
+      <Typography component='h1' variant='h4' gutterBottom={true}>Şu anda sokağa çıkabilir misin?</Typography>
       <AgeForm onSubmit={onSubmit} onClear={() => setLockdownStatus(null)} />
-      <Typography component="p" align='right' style={{ marginTop: '10px' }}>
-        <TimeTicker title="Yerel saat" />
+      <Typography component='p' align='right' style={{ marginTop: '10px' }}>
+        <Clock>
+          {(timeString) => <><b>Yerel saat:&nbsp;</b>{timeString}</>}
+        </Clock>
       </Typography>
       {!!lockdownStatus && <StatusDisplay status={lockdownStatus} />}
+      <Dashboard />
     </Container>
   );
 }

@@ -1,9 +1,11 @@
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { ThemeProvider } from '@material-ui/core/styles';
 import Head from 'next/head';
 import { AppProps } from 'next/app';
-import config from '../common/config.json';
-import SmTags from '../components/sm-tags/tags';
+import config from '@common/config.json';
+import SmTags from '@components/sm-tags/tags';
+import theme from 'styles/theme';
 
 function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
@@ -20,8 +22,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="keywords" content={config.keywords} />
         <SmTags {...config} />
       </Head>
-      <CssBaseline />
-      <Component {...pageProps} />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Component {...pageProps} />
+      </ThemeProvider>
     </>
   );
 }

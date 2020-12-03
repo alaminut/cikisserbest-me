@@ -3,5 +3,19 @@
   "description": "Türkiye Cumhuriyeti salgınla mücadele önlemleri kapsamında sokağa çıkma yasağı olup olmadığını öğren.",
   "image": "https://cikisserbest.me/lockdown.jpg",
   "url": "https://cikisserbest.me",
-  "keywords": "sokağa çıkma yasağı türkiye,salgın,65 yaş üzeri sokağa çıkma yasağı,korona,corona,covid"
+  "keywords": "sokağa çıkma yasağı türkiye,salgın,65 yaş üzeri sokağa çıkma yasağı,korona,corona,covid",
+  "ageGroups": [
+    {
+      "title": "20 yaş altındakiler",
+      "age": 19
+    },
+    {
+      "title": "65 yaş ve üzerindekiler",
+      "age": 65
+    },
+    {
+      "title": "20 - 65 yaş arasındakiler",
+      "age": 20
+    }
+  ]
 }
