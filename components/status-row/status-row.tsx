@@ -13,19 +13,23 @@ type Props = {
 }
 
 const StatusRow = ({ title, subtitle, statusChecker }: Props) => {
-  const [status, setStatus] = useState(statusChecker());
+  const [status, setStatus] = useState<LockdownStatus>();
   const [timerColor, setTimerColor] = useState<string>(common.white);
 
   useEffect(() => {
-    setTimerColor(status.lockdown ? red[500] : green[500]);
+    if (status) {
+      setTimerColor(status.lockdown ? red[500] : green[500]);
+    }
   }, [status]);
 
   useEffect(() => {
+    statusChecker();
     const interval = setInterval(() => setStatus(statusChecker()), 1000);
+
     return () => clearInterval(interval);
   }, [statusChecker]);
 
-  return (
+  return status ? (
     <ListItem divider>
       <ErrorBoundary>
         <ListItemIcon>
@@ -47,7 +51,7 @@ const StatusRow = ({ title, subtitle, statusChecker }: Props) => {
         </ListItemSecondaryAction>
       </ErrorBoundary>
     </ListItem>
-  );
+  ) : null;
 };
 
 export default StatusRow;
